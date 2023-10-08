@@ -139,6 +139,14 @@ fn char<'a>(expected_char: char) -> BoxParser<'a, char> {
     matches(move |ch| ch == expected_char)
 }
 
+fn onenine<'a>() -> impl Parser<'a, char> {
+    matches(|ch| ch >= '1' && ch <= '9')
+}
+
+fn digit<'a>() -> impl Parser<'a, char> {
+    char('0').or(onenine())
+}
+
 fn lazy<'a, A, F>(parser: F) -> BoxParser<'a, A>
 where
     F: Fn() -> BoxParser<'a, A> + 'a,

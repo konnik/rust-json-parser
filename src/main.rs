@@ -1,10 +1,15 @@
 mod parser;
 
 use parser::parse_json;
+use std::env;
 
 fn main() {
-    match parse_json("null") {
+    let mut args = env::args();
+    args.next();
+    let json = args.next().expect("No json argument.");
+
+    match parse_json(&json) {
         Some(value) => println!("SUCCESS: Parsed as {value:?}"),
-        None => print!("FAILURE: Could not parse input."),
+        None => println!("FAILURE: Could not parse input."),
     }
 }
