@@ -1,10 +1,17 @@
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+use std::collections::HashMap;
+
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum JsonValue {
     Null,
     Bool(bool),
+    Number(f64),
+    // String(String),
+    // Array(Vec<JsonValue>),
+    // Object(HashMap<String, JsonValue>),
 }
 
 /// Parse a string into a JsonValue.
+/// This is the public API.
 pub fn parse_json<'a>(input: &'a str) -> Option<JsonValue> {
     match element().parse(input) {
         Some(("", value)) => Some(value),
@@ -12,6 +19,7 @@ pub fn parse_json<'a>(input: &'a str) -> Option<JsonValue> {
     }
 }
 
+/// Parse a JsonValue that can be surrounded by whitespace.
 fn element<'a>() -> impl Parser<'a, JsonValue> {
     ws().followed_by(value())
         .and_then(|v| ws().and_then(move |_| BoxParser::new(succeed(v))))
@@ -36,6 +44,14 @@ fn js_true<'a>() -> BoxParser<'a, JsonValue> {
 fn js_false<'a>() -> impl Parser<'a, JsonValue> {
     literal("false").map(|_| JsonValue::Bool(false))
 }
+
+/// Vad är en parser?
+///
+/// En parser är en *funktion* som tar en sträng som input och om allt
+/// går bra returnerar ett värde + resten av inputen.
+///
+/// Annars returneras None.
+type Parser2<'a, T> = dyn Fn(&'a str) -> Option<(&'a str, T)>;
 
 type ParseResult<'a, T> = Option<(&'a str, T)>;
 
